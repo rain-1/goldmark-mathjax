@@ -7,6 +7,40 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
+/////////////////////
+
+// https://github.com/yuin/goldmark/discussions/260
+
+// TabWidth calculates actual width of a tab at the given position.
+func TabWidth(currentPos int) int {
+	return 4 - currentPos%4
+}
+
+// DedentPosition dedents lines by the given width.
+func DedentPosition(bs []byte, currentPos, width int) (pos, padding int) {
+	if width == 0 {
+		return 0, 0
+	}
+	w := 0
+	l := len(bs)
+	i := 0
+	for ; i < l; i++ {
+		if bs[i] == '\t' {
+			w += TabWidth(currentPos + w)
+		} else if bs[i] == ' ' {
+			w++
+		} else {
+			break
+		}
+	}
+	if w >= width {
+		return i, w - width
+	}
+	return i, 0
+}
+
+/////////////////////
+
 type mathJaxBlockParser struct {
 }
 
@@ -57,7 +91,7 @@ func (b *mathJaxBlockParser) Continue(node ast.Node, reader text.Reader, pc pars
 		}
 	}
 
-	pos, padding := util.DedentPosition(line, 0, data.indent)
+	pos, padding := DedentPosition(line, 0, data.indent)
 	seg := text.NewSegmentPadding(segment.Start+pos, segment.Stop, padding)
 	node.Lines().Append(seg)
 	reader.AdvanceAndSetPadding(segment.Stop-segment.Start-pos-1, padding)

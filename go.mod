@@ -1,8 +1,8 @@
-module github.com/litao91/goldmark-mathjax
+module github.com/rain-1/goldmark-mathjax
 
-go 1.14
+go 1.16
 
 require (
 	github.com/stretchr/testify v1.6.1
-	github.com/yuin/goldmark v1.2.1
+	github.com/yuin/goldmark v1.4.2
 )
